@@ -42,6 +42,25 @@
                 </svg>
             </button>
 
+            <button class="history-entry-btn" onclick="showHistory()">📋 历史记录</button>
+
+        </div>
+    </section>
+
+    <!-- ========== 历史记录页 ========== -->
+    <section id="history-section" style="display:none;">
+        <div class="history-container">
+            <div class="history-header">
+                <button class="back-btn" onclick="backToLanding()">← 返回首页</button>
+                <h2 class="history-title">📋 历史记录</h2>
+                <button class="clear-all-btn" id="history-clear-all" onclick="clearAllHistory()">🗑 清空全部</button>
+            </div>
+            <div id="history-list"></div>
+            <div id="history-empty" style="display:none;">
+                <div class="history-empty-icon">📭</div>
+                <p class="history-empty-text">还没有测试记录</p>
+                <button class="start-btn" onclick="startTest()" style="font-size:16px; padding:14px 40px;">开始第一次测试</button>
+            </div>
         </div>
     </section>
 
@@ -138,7 +157,7 @@
             </div>
 
             <!-- 操作按钮 -->
-            <div class="result-actions">
+            <div class="result-actions" id="result-actions">
                 <button class="action-btn retry-btn" onclick="retryTest()">🔄 重新测试</button>
                 <button class="action-btn share-btn" onclick="shareResult()">📤 分享结果</button>
             </div>

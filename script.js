@@ -225,6 +225,9 @@ const QUESTIONS = [
 let currentQuestion = 0;
 let answers = {};
 let selectedOption = null;
+const HISTORY_KEY = 'love_type_test_history';
+const MAX_HISTORY = 20;
+let viewingHistoryId = null;
 
 /* ===== 测试流程 ===== */
 function startTest() {
@@ -448,14 +451,22 @@ function determineLoveType(scores) {
 }
 
 /* ===== 结果展示 ===== */
-function showResults() {
+function showResults(storedScores, storedTypeKey) {
+    const isHistory = !!storedScores;
+
     document.getElementById('test-section').style.display = 'none';
     document.getElementById('landing-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'block';
 
-    const scores = calculateScores();
-    const typeKey = determineLoveType(scores);
+    const scores = storedScores || calculateScores();
+    const typeKey = storedTypeKey || determineLoveType(scores);
     const typeData = LOVE_TYPES[typeKey];
+
+    // 非历史模式：保存到历史记录
+    if (!isHistory) {
+        saveResultToHistory(scores, typeKey);
+    }
 
     // 综合分
     const overallScore = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / 6);
@@ -505,6 +516,22 @@ function showResults() {
 
     // ---- 匹配分析 ----
     renderMatchAnalysis(typeKey, scores);
+
+    // ---- 按钮区（历史模式 vs 正常模式） ----
+    const actionsEl = document.getElementById('result-actions');
+    if (isHistory) {
+        actionsEl.innerHTML = `
+            <button class="action-btn retry-btn" onclick="backToHistory()">← 返回历史</button>
+            <button class="action-btn retry-btn" onclick="retryTest()">🔄 重新测试</button>
+            <button class="action-btn share-btn" onclick="shareResult()">📤 分享结果</button>
+        `;
+    } else {
+        actionsEl.innerHTML = `
+            <button class="action-btn retry-btn" onclick="retryTest()">🔄 重新测试</button>
+            <button class="action-btn share-btn" onclick="shareResult()">📤 分享结果</button>
+            <button class="action-btn history-btn" onclick="showHistory()">📋 历史记录</button>
+        `;
+    }
 
     // ---- 滚动到顶部 ----
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -782,7 +809,9 @@ function retryTest() {
     currentQuestion = 0;
     answers = {};
     selectedOption = null;
+    viewingHistoryId = null;
     document.getElementById('results-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'none';
     document.getElementById('test-section').style.display = 'none';
     document.getElementById('landing-section').style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -808,4 +837,132 @@ function shareResult() {
             setTimeout(() => { btn.textContent = origText; }, 2000);
         }).catch(() => {});
     }
+}
+
+/* ===== 历史记录 ===== */
+function saveResultToHistory(scores, typeKey) {
+    try {
+        const history = loadHistory();
+        const sortedDims = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const topDim = DIMENSIONS.find(d => d.id === sortedDims[0][0]);
+        const overallScore = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / 6);
+
+        const record = {
+            id: Date.now(),
+            date: new Date().toLocaleString('zh-CN', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            typeKey: typeKey,
+            scores: scores,
+            overallScore: overallScore,
+            topDim: { id: topDim.id, name: topDim.name, emoji: topDim.emoji },
+        };
+
+        history.unshift(record);
+        if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (e) {
+        // localStorage 不可用时静默失败
+    }
+}
+
+function loadHistory() {
+    try {
+        const data = localStorage.getItem(HISTORY_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function showHistory() {
+    document.getElementById('landing-section').style.display = 'none';
+    document.getElementById('test-section').style.display = 'none';
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'block';
+    renderHistoryList();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderHistoryList() {
+    const history = loadHistory();
+    const listEl = document.getElementById('history-list');
+    const emptyEl = document.getElementById('history-empty');
+
+    if (history.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+        document.getElementById('history-clear-all').style.display = 'none';
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+    document.getElementById('history-clear-all').style.display = '';
+
+    let html = '';
+    history.forEach(record => {
+        const typeData = LOVE_TYPES[record.typeKey] || { name: '未知类型', emoji: '❓' };
+        html += `
+            <div class="history-card" onclick="viewHistoryResult(${record.id})">
+                <div class="history-card-main">
+                    <div class="history-type-emoji">${typeData.emoji}</div>
+                    <div class="history-type-info">
+                        <div class="history-type-name">${typeData.name}</div>
+                        <div class="history-type-date">${record.date}</div>
+                    </div>
+                </div>
+                <div class="history-card-scores">
+                    <span class="history-overall">综合 ${record.overallScore}分</span>
+                    <span class="history-top-dim">${record.topDim.emoji} ${record.topDim.name} ${record.scores[record.topDim.id]}分</span>
+                </div>
+                <button class="history-delete-btn" onclick="event.stopPropagation(); deleteHistoryItem(${record.id})" title="删除">✕</button>
+            </div>
+        `;
+    });
+
+    listEl.innerHTML = html;
+}
+
+function viewHistoryResult(id) {
+    const history = loadHistory();
+    const record = history.find(r => r.id === id);
+    if (!record) return;
+
+    viewingHistoryId = id;
+    showResults(record.scores, record.typeKey);
+}
+
+function backToHistory() {
+    viewingHistoryId = null;
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'block';
+    // 清理图表实例，避免残留
+    ['radar-chart', 'bar-chart'].forEach(id => {
+        const dom = document.getElementById(id);
+        if (dom._echart) { dom._echart.dispose(); dom._echart = null; }
+    });
+    renderHistoryList();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function backToLanding() {
+    viewingHistoryId = null;
+    document.getElementById('history-section').style.display = 'none';
+    document.getElementById('landing-section').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteHistoryItem(id) {
+    if (!confirm('确定要删除这条记录吗？')) return;
+    const history = loadHistory();
+    const filtered = history.filter(r => r.id !== id);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered));
+    // 如果正在查看被删除的记录，返回历史列表
+    if (viewingHistoryId === id) viewingHistoryId = null;
+    renderHistoryList();
+}
+
+function clearAllHistory() {
+    if (!confirm('确定要清空全部历史记录吗？此操作不可恢复。')) return;
+    localStorage.removeItem(HISTORY_KEY);
+    viewingHistoryId = null;
+    renderHistoryList();
 }

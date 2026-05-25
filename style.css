@@ -745,6 +745,225 @@ body {
     50% { transform: scale(1.08); }
 }
 
+/* ===== 落地页历史按钮 ===== */
+.history-entry-btn {
+    display: block;
+    margin: 16px auto 0;
+    background: transparent;
+    border: 2px solid var(--purple-light);
+    color: var(--purple);
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+}
+
+.history-entry-btn:hover {
+    background: rgba(124, 92, 252, 0.08);
+    transform: translateY(-2px);
+}
+
+/* ===== 历史记录页 ===== */
+#history-section {
+    min-height: 100vh;
+    padding: 24px;
+    animation: fadeInUp 0.4s ease;
+}
+
+.history-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 16px 0;
+}
+
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 12px;
+}
+
+.history-title {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.back-btn {
+    background: var(--card-bg);
+    border: none;
+    color: var(--text-secondary);
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+    box-shadow: var(--shadow);
+    white-space: nowrap;
+}
+
+.back-btn:hover {
+    background: #F5F0FA;
+    color: var(--text-primary);
+}
+
+.clear-all-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-light);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+    white-space: nowrap;
+}
+
+.clear-all-btn:hover {
+    border-color: var(--pink);
+    color: var(--pink-dark);
+    background: rgba(255, 107, 157, 0.05);
+}
+
+/* 历史卡片 */
+.history-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.history-card:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.history-card-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.history-type-emoji {
+    font-size: 36px;
+    flex-shrink: 0;
+}
+
+.history-type-info {
+    min-width: 0;
+}
+
+.history-type-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.history-type-date {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.history-card-scores {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.history-overall {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    background: rgba(124, 92, 252, 0.1);
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.history-top-dim {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.history-delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-light);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font);
+    line-height: 1;
+}
+
+.history-delete-btn:hover {
+    background: rgba(255, 107, 157, 0.1);
+    color: var(--pink-dark);
+}
+
+/* 历史空状态 */
+#history-empty {
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeInUp 0.4s ease;
+}
+
+.history-empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.history-empty-text {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+}
+
+/* 历史记录按钮（结果页） */
+.history-btn {
+    background: var(--card-bg);
+    color: var(--purple);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--purple-light);
+}
+
+.history-btn:hover {
+    background: rgba(124, 92, 252, 0.06);
+    transform: translateY(-2px);
+}
+
 /* ===== 响应式 ===== */
 @media (max-width: 680px) {
     .main-title {
@@ -816,6 +1035,23 @@ body {
     .question-text {
         font-size: 17px;
     }
+
+    .history-card {
+        flex-wrap: wrap;
+        padding: 18px 16px;
+    }
+
+    .history-card-scores {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .history-header {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 480px) {
@@ -871,7 +1107,8 @@ body {
 }
 
 @media print {
-    .nav-area, .dot-grid, .result-actions, .disclaimer {
+    .nav-area, .dot-grid, .result-actions, .disclaimer,
+    .history-entry-btn, #history-section, .history-delete-btn {
         display: none;
     }
 
