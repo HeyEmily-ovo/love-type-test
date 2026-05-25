@@ -533,12 +533,14 @@ function showResults(storedScores, storedTypeKey) {
             <button class="action-btn retry-btn" onclick="backToHistory()">← 返回历史</button>
             <button class="action-btn retry-btn" onclick="retryTest()">🔄 重新测试</button>
             <button class="action-btn share-btn" onclick="shareResult()">📤 分享结果</button>
+            <button class="action-btn encyclopedia-btn" onclick="showEncyclopedia()">📖 恋爱图鉴</button>
         `;
     } else {
         actionsEl.innerHTML = `
             <button class="action-btn retry-btn" onclick="retryTest()">🔄 重新测试</button>
             <button class="action-btn share-btn" onclick="shareResult()">📤 分享结果</button>
             <button class="action-btn history-btn" onclick="showHistory()">📋 历史记录</button>
+            <button class="action-btn encyclopedia-btn" onclick="showEncyclopedia()">📖 恋爱图鉴</button>
         `;
     }
 

@@ -959,6 +959,18 @@ body {
     border: 2px solid var(--purple-light);
 }
 
+.encyclopedia-btn {
+    background: var(--card-bg);
+    color: #D4912A;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--gold);
+}
+
+.encyclopedia-btn:hover {
+    background: rgba(255, 179, 71, 0.08);
+    transform: translateY(-2px);
+}
+
 .history-btn:hover {
     background: rgba(124, 92, 252, 0.06);
     transform: translateY(-2px);
