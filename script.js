@@ -239,6 +239,7 @@ function startTest() {
 
     document.getElementById('landing-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'none';
     document.getElementById('test-section').style.display = 'flex';
 
     initDotGrid();
