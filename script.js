@@ -228,12 +228,14 @@ let selectedOption = null;
 const HISTORY_KEY = 'love_type_test_history';
 const MAX_HISTORY = 20;
 let viewingHistoryId = null;
+let resultsShown = false;
 
 /* ===== 测试流程 ===== */
 function startTest() {
     currentQuestion = 0;
     answers = {};
     selectedOption = null;
+    resultsShown = false;
 
     document.getElementById('landing-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'none';
@@ -452,6 +454,10 @@ function determineLoveType(scores) {
 
 /* ===== 结果展示 ===== */
 function showResults(storedScores, storedTypeKey) {
+    // 防止重复调用（如答题完成自动跳转 + 手动点下一题同时触发）
+    if (resultsShown && !storedScores) return;
+    resultsShown = true;
+
     const isHistory = !!storedScores;
 
     document.getElementById('test-section').style.display = 'none';
@@ -810,6 +816,7 @@ function retryTest() {
     answers = {};
     selectedOption = null;
     viewingHistoryId = null;
+    resultsShown = false;
     document.getElementById('results-section').style.display = 'none';
     document.getElementById('history-section').style.display = 'none';
     document.getElementById('test-section').style.display = 'none';
