@@ -964,6 +964,509 @@ body {
     transform: translateY(-2px);
 }
 
+/* ===== 图鉴入口按钮 ===== */
+.encyclopedia-entry-btn {
+    display: block;
+    margin: 10px auto 0;
+    background: transparent;
+    border: 2px solid var(--gold);
+    color: #D4912A;
+    padding: 12px 36px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+}
+
+.encyclopedia-entry-btn:hover {
+    background: rgba(255, 179, 71, 0.1);
+    transform: translateY(-2px);
+}
+
+/* ===== 图鉴页 ===== */
+#encyclopedia-section {
+    min-height: 100vh;
+    padding: 24px;
+    animation: fadeInUp 0.5s ease;
+}
+
+.encyclopedia-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 0;
+}
+
+.encyclopedia-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.encyclopedia-header .back-btn {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+}
+
+.encyclopedia-title {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.encyclopedia-subtitle {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.encyclopedia-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 40px 0 16px;
+}
+
+.encyclopedia-hint {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+/* ----- 类型翻转卡 ----- */
+.type-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.type-card {
+    perspective: 1000px;
+    height: 380px;
+    cursor: pointer;
+}
+
+.type-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.type-card.flipped .type-card-inner {
+    transform: rotateY(180deg);
+}
+
+.type-card-front,
+.type-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    overflow-y: auto;
+}
+
+.type-card-front {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.type-card:hover .type-card-front {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.type-card-emoji {
+    font-size: 52px;
+}
+
+.type-card-name {
+    font-size: 19px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.type-card-tagline {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.type-card-vibe {
+    font-size: 12px;
+    color: var(--text-light);
+    background: rgba(124, 92, 252, 0.06);
+    padding: 6px 12px;
+    border-radius: 20px;
+    max-width: 90%;
+}
+
+.type-card-hint {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-light);
+    opacity: 0.6;
+}
+
+/* 卡片背面 */
+.type-card-back {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.type-card-back-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+}
+
+.type-traits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.type-trait-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.type-trait-emoji {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.type-trait-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.type-trait-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.type-trait-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* 属性条 */
+.type-stat-bars {
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+.stat-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.stat-bar-label {
+    font-size: 10px;
+    color: var(--text-light);
+    width: 48px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.stat-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(124, 92, 252, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-bar-value {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    width: 24px;
+    flex-shrink: 0;
+}
+
+/* ----- 配对选择器 ----- */
+.match-selector {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.match-selector-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-right: 4px;
+}
+
+.match-selector-type {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+    white-space: nowrap;
+}
+
+.match-selector-type:hover {
+    border-color: var(--purple-light);
+    background: rgba(124, 92, 252, 0.06);
+    transform: translateY(-2px);
+}
+
+.match-selector-type.active {
+    border-color: var(--purple);
+    background: rgba(124, 92, 252, 0.1);
+    color: var(--purple-dark);
+}
+
+/* ----- 配对矩阵 ----- */
+.match-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+}
+
+.match-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+    min-width: 700px;
+}
+
+.match-table th,
+.match-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.match-th {
+    padding: 8px 4px;
+    font-size: 18px;
+    border-radius: 10px;
+    background: rgba(124, 92, 252, 0.04);
+    transition: all var(--transition);
+    cursor: default;
+}
+
+.match-th-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.match-th.highlighted {
+    background: rgba(124, 92, 252, 0.12);
+}
+
+.match-row-header {
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: rgba(124, 92, 252, 0.02);
+    font-size: 18px;
+    transition: all var(--transition);
+}
+
+.match-row-header .match-th-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.match-row-header.highlighted {
+    background: rgba(124, 92, 252, 0.12);
+}
+
+.match-th-emoji {
+    font-size: 18px;
+}
+
+.match-cell {
+    border-radius: 10px;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.match-cell:hover {
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.match-cell.match-high {
+    background: rgba(255, 107, 157, 0.12);
+}
+
+.match-cell.match-mid {
+    background: rgba(255, 179, 71, 0.1);
+}
+
+.match-cell.match-low {
+    background: rgba(155, 139, 171, 0.08);
+}
+
+.match-cell.highlighted {
+    box-shadow: inset 0 0 0 2px var(--purple);
+    background: rgba(124, 92, 252, 0.15) !important;
+}
+
+.match-cell-emoji {
+    font-size: 16px;
+}
+
+.match-cell-stars {
+    font-size: 9px;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+/* ----- 配对弹窗 ----- */
+.match-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(45, 27, 62, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.match-popup-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(45, 27, 62, 0.25);
+    position: relative;
+    animation: fadeInUp 0.35s ease;
+}
+
+.match-popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all var(--transition);
+}
+
+.match-popup-close:hover {
+    background: rgba(255, 107, 157, 0.1);
+    color: var(--pink-dark);
+}
+
+.match-popup-header {
+    margin-bottom: 12px;
+}
+
+.match-popup-types {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.match-popup-badge {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.match-popup-stars {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.match-popup-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.match-popup-btn {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: #fff;
+    border: none;
+    padding: 10px 36px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+}
+
+.match-popup-btn:hover {
+    box-shadow: 0 6px 20px rgba(124, 92, 252, 0.3);
+    transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* ===== 响应式 ===== */
 @media (max-width: 680px) {
     .main-title {
@@ -1052,6 +1555,27 @@ body {
     .history-header {
         flex-wrap: wrap;
     }
+
+    .type-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .type-card {
+        height: 340px;
+    }
+
+    .encyclopedia-title {
+        font-size: 24px;
+    }
+
+    .match-selector {
+        gap: 6px;
+    }
+
+    .match-selector-type {
+        padding: 4px 10px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1104,9 +1628,27 @@ body {
     .score-card .score-value {
         font-size: 24px;
     }
+
+    .type-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .type-card {
+        height: 320px;
+    }
+
+    .encyclopedia-title {
+        font-size: 20px;
+    }
+
+    .match-selector-type {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
 }
 
 @media print {
+    .encyclopedia-entry-btn, #encyclopedia-section { display: none; }
     .nav-area, .dot-grid, .result-actions, .disclaimer,
     .history-entry-btn, #history-section, .history-delete-btn {
         display: none;

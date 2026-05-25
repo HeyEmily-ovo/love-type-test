@@ -240,6 +240,7 @@ function startTest() {
     document.getElementById('landing-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'none';
     document.getElementById('history-section').style.display = 'none';
+    document.getElementById('encyclopedia-section').style.display = 'none';
     document.getElementById('test-section').style.display = 'flex';
 
     initDotGrid();
@@ -464,6 +465,7 @@ function showResults(storedScores, storedTypeKey) {
     document.getElementById('test-section').style.display = 'none';
     document.getElementById('landing-section').style.display = 'none';
     document.getElementById('history-section').style.display = 'none';
+    document.getElementById('encyclopedia-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'block';
 
     const scores = storedScores || calculateScores();
@@ -820,6 +822,7 @@ function retryTest() {
     resultsShown = false;
     document.getElementById('results-section').style.display = 'none';
     document.getElementById('history-section').style.display = 'none';
+    document.getElementById('encyclopedia-section').style.display = 'none';
     document.getElementById('test-section').style.display = 'none';
     document.getElementById('landing-section').style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -954,6 +957,7 @@ function backToHistory() {
 function backToLanding() {
     viewingHistoryId = null;
     document.getElementById('history-section').style.display = 'none';
+    document.getElementById('encyclopedia-section').style.display = 'none';
     document.getElementById('landing-section').style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -973,4 +977,369 @@ function clearAllHistory() {
     localStorage.removeItem(HISTORY_KEY);
     viewingHistoryId = null;
     renderHistoryList();
+}
+
+/* ===== 恋爱类型图鉴 ===== */
+
+/* ----- 类型特质卡数据 ----- */
+const TYPE_TRAITS = {
+    'secure': {
+        vibe: '人间理想型，行走的"稳稳幸福"',
+        traits: [
+            { emoji: '🧘', name: '情绪稳定', text: '不查岗不翻手机不搞冷战，吵架归吵架，从没想过要分手' },
+            { emoji: '🤗', name: '敢亲密的勇气', text: '不怕靠近、不惧依赖，敞开心扉对你来说是加分项而不是风险' },
+            { emoji: '🎯', name: '边界感大师', text: '爱得起也放得下，不卑不亢，既不讨好也不控制' },
+            { emoji: '🛡️', name: '安全感发射塔', text: '你的存在本身就是伴侣的定心丸，跟你恋爱不用天天猜谜' },
+        ],
+        loveLanguage: '高质量陪伴 + 肯定的话语',
+        dangerZone: '太佛系了偶尔让伴侣觉得"你到底爱不爱我？？"——偶尔也需要热烈一下！',
+        perfectDate: '在家一起做饭，窝在沙发上看烂片吐槽，然后舒服地睡去——平淡但有温度',
+        stats: { stability: 95, romance: 60, intensity: 40, independence: 75 },
+    },
+    'anxious': {
+        vibe: '爱到深处自然"黏"，你是甜蜜的暴风雨',
+        traits: [
+            { emoji: '💗', name: '情感浓度拉满', text: '你的伴侣永远不会怀疑自己是否"被爱着"，你的爱是高浓度原浆' },
+            { emoji: '📡', name: '超敏感雷达', text: '对象3小时没回消息？你脑子里已经演完80集宫斗剧+20集悲情韩剧' },
+            { emoji: '🎁', name: '付出型选手', text: '你喜欢用行动证明爱——消息秒回、礼物不断、随叫随到' },
+            { emoji: '🦋', name: '为爱发电', text: '谈恋爱是你人生的高光模式，爱情是原动力，一恋爱整个人都亮了' },
+        ],
+        loveLanguage: '频繁的联系 + 言语的 reassurance',
+        dangerZone: '容易在恋爱中弄丢自己——你的世界不该只有ta一个人！',
+        perfectDate: '24小时黏在一起：从早安到晚安全程高甜，聊天记录一天能翻到手酸',
+        stats: { stability: 25, romance: 90, intensity: 95, independence: 15 },
+    },
+    'avoidant': {
+        vibe: '人间清醒冰山美人，翻江倒海全在内心戏',
+        traits: [
+            { emoji: '🧊', name: '情绪冷冻术', text: '外表：好的没事我OK。内心：我不OK但我绝对不会让你知道我OK不OK' },
+            { emoji: '🦅', name: '独立王者', text: '"我一个人也能活得很好"不是逞强，是真的。自由是底线，独处是刚需' },
+            { emoji: '🚪', name: '撤退本能', text: '对方一靠近你就想逃，对方一冷淡你又想靠近——标准的"近之则不逊远之则怨"' },
+            { emoji: '🔐', name: '情感保险箱', text: '真实感受锁在心底，密码连自己都快忘了。不是不爱，是不会"安全地爱"' },
+        ],
+        loveLanguage: '尊重彼此空间 + 行动而非言语',
+        dangerZone: '过度独立让人误以为你不在乎——其实你只是不知道怎么表达在乎！',
+        perfectDate: '各自做自己的事，偶尔抬头对视笑一下，不用说话但很安心——距离产生美',
+        stats: { stability: 55, romance: 15, intensity: 20, independence: 95 },
+    },
+    'chaotic': {
+        vibe: '又想要又害怕，内心每天都在拍谍战片',
+        traits: [
+            { emoji: '🎭', name: '纠结综合体', text: '渴望被爱又害怕靠近，像一只想伸爪又缩回去的猫。这不是"作"，是自我保护' },
+            { emoji: '🎢', name: '情绪过山车', text: '上午：他好爱我。下午：他一定不爱我了。晚上：算了分手吧。凌晨：呜呜呜想他' },
+            { emoji: '🔍', name: '侦探级敏感', text: '能从对方的一个句号、回复速度、表情包选择中分析出"他变了"的充分证据' },
+            { emoji: '💔', name: '旧伤未愈', text: '你可能在过往经历中受过伤，或成长中缺乏稳定情感支持。这不能怪你' },
+        ],
+        loveLanguage: '持续的安全感证明 + 不催促慢慢来',
+        dangerZone: '脑补能力太强，容易把"已读不回"升级成"他出轨了然后我们分手了我要孤独终老了"！',
+        perfectDate: 'ta一边说"我在"一边给你递奶茶，什么都不做，就安安静静陪着你',
+        stats: { stability: 10, romance: 70, intensity: 90, independence: 25 },
+    },
+    'possessive_dominant': {
+        vibe: '醋王本王，你的主权意识拉满格',
+        traits: [
+            { emoji: '👑', name: '主权宣示者', text: '你的爱带着浓浓的"这是我的，谁也别碰"气场，被爱的人像珍宝，也可能像囚犯' },
+            { emoji: '🔥', name: '醋意即爱意', text: '吃醋是你表达在乎的方式——"我吃醋=我爱你"，但对方不一定get到' },
+            { emoji: '🎯', name: '领地意识Max', text: '对象跟异性多说两句话？朋友圈有异性点赞？你的警报系统立刻拉响' },
+            { emoji: '💎', name: '专属感至上', text: '你要的不是大众款恋爱，而是"只属于我的那个你"，独一无二，不容分享' },
+        ],
+        loveLanguage: '专属的注意力 + 排他性的偏爱',
+        dangerZone: '控制欲太强会让伴侣窒息——爱是手里的沙，紧握反而漏得快！',
+        perfectDate: 'ta全程只看着你、只跟你说话、只对你笑——你是全场的绝对焦点',
+        stats: { stability: 45, romance: 75, intensity: 85, independence: 30 },
+    },
+    'romantic_sweet': {
+        vibe: '行走的韩剧编剧，恋爱就要有糖份',
+        traits: [
+            { emoji: '🌸', name: '仪式感狂魔', text: '生日要有惊喜、纪念日要有仪式、日常要有情话，少了哪样都觉得"不够爱"' },
+            { emoji: '💌', name: '情话输出机', text: '"我好想你""你今天好好看""有你真好"——这种话你一天能说八百遍，对方甜到齁' },
+            { emoji: '🎬', name: '偶像剧导演', text: '你会悄悄策划惊喜：手写信、藏宝图式礼物、突然出现在ta公司楼下——浪漫永动机' },
+            { emoji: '💝', name: '爱要大声说', text: '你觉得不说出口的爱不是完整的爱。行动固然重要，但"说出来"和"做出来"缺一不可' },
+        ],
+        loveLanguage: '精心时刻 + 肯定的言词 + 用心的礼物',
+        dangerZone: '对浪漫的期待值太高，可能错过那些"不浪漫但真心"的人！',
+        perfectDate: '精心策划的一天：从花束到日落到星星，每个环节都有小惊喜，最后发一条甜度超标的朋友圈',
+        stats: { stability: 55, romance: 98, intensity: 75, independence: 45 },
+    },
+    'independent_solo': {
+        vibe: '我自盛开蝴蝶爱来不来，独自美丽是人生底色',
+        traits: [
+            { emoji: '✨', name: '自我优先主义者', text: '谈恋爱不能阻止你搞事业——个人成长永远排第一，恋爱只是锦上添花' },
+            { emoji: '🏔️', name: '独立即铠甲', text: '你觉得"高质量单身"比"凑合恋爱"爽一百倍，宁缺毋滥是你的恋爱信条' },
+            { emoji: '🌍', name: '完整的世界公民', text: '你有自己的朋友圈、事业、爱好、人生目标——恋爱只是你精彩人生的一部分' },
+            { emoji: '⚡', name: '边界感强者', text: '如果一段关系影响你的发展，你会果断离开。这份清醒，很多人一辈子学不会' },
+        ],
+        loveLanguage: '尊重彼此独立 + 不打扰的温柔',
+        dangerZone: '独立过头可能变成"不敢依赖"——真正的强大是可以坦然需要别人！',
+        perfectDate: '两个人各自做自己的事，偶尔交流一下今天的见闻和思考，精神共鸣比肢体接触更让你心动',
+        stats: { stability: 65, romance: 30, intensity: 25, independence: 98 },
+    },
+    'rational_calm': {
+        vibe: '佛系恋爱代言人，缘分来了接着走了不送',
+        traits: [
+            { emoji: '🧘', name: '人间清醒', text: '不玩套路不搞试探，爱就是两个人在一起开心，不开心就分开——简简单单' },
+            { emoji: '🌊', name: '情绪恒温器', text: '不焦虑、不回避、不占有、不过度浪漫——你是恋爱中的"旁观者清"但又在其中' },
+            { emoji: '🔬', name: '关系分析师', text: '你善于看清关系本质，不会被一时的上头冲昏头脑。烂桃花？不存在的' },
+            { emoji: '🤝', name: '细水长流派', text: '你的爱不华丽但扎实，不炙热但恒温——是那种"用行动而非言语"的实在派' },
+        ],
+        loveLanguage: '稳定踏实的行动 + 自然舒服的相处',
+        dangerZone: '太理性偶尔让对方觉得"你是不是不够爱我"——不妨偶尔不冷静一下！',
+        perfectDate: '安静的咖啡馆或散步，有一搭没一搭地聊天，不用刻意找话题，舒服就完事了',
+        stats: { stability: 85, romance: 35, intensity: 20, independence: 80 },
+    },
+};
+
+/* ----- 配对兼容数据（8×8 矩阵） ----- */
+const MATCH_MATRIX = {
+    'secure': {
+        'secure':          { level: 3, emoji: '💎', title: '神仙组合', text: '两个安全型在一起就是教科书级别的健康恋爱，势均力敌互相成就，别人口中的"谈过最好的恋爱"' },
+        'anxious':         { level: 3, emoji: '💖', title: '治愈之恋', text: '安全型能给焦虑型最需要的 reassurance。你的"稳稳的幸福"是ta最好的解药' },
+        'avoidant':        { level: 2, emoji: '🌤️', title: '慢慢融化', text: '安全型懂回避型的独立需求，不会硬闯但永远在身后，是最有可能融化冰山的人' },
+        'chaotic':         { level: 3, emoji: '🫂', title: '安全港湾', text: '你是纠结矛盾型最需要的"安全基地"。有你在，ta终于敢慢慢放下防备' },
+        'possessive_dominant': { level: 2, emoji: '🔑', title: '理解万岁', text: '安全型能读懂占有欲背后的不安，用稳定的爱告诉ta：不用醋，我哪也不去' },
+        'romantic_sweet':  { level: 3, emoji: '🌸', title: '浪漫安全感', text: '一个给安全感一个给仪式感，既甜又稳，是朋友圈里最让人羡慕的那对' },
+        'independent_solo':{ level: 2, emoji: '🌿', title: '舒适距离', text: '安全型尊重独立型的边界，两人各自发光又互相欣赏，松弛感拉满' },
+        'rational_calm':   { level: 3, emoji: '🏠', title: '恒温爱情', text: '两个人都走踏实风，不炒作不内耗不狗血，关系舒服得像穿了十年的旧T恤' },
+    },
+    'anxious': {
+        'secure':          { level: 3, emoji: '💖', title: '治愈之恋', text: '安全型是上天派来治愈你的。ta的"不会离开"是你听过最动听的情话' },
+        'anxious':         { level: 1, emoji: '🎢', title: '情绪叠Buff', text: '两个焦虑脑在一起＝互相传染焦虑。容易陷入"你爱不爱我？你猜我爱不爱你？"的死循环' },
+        'avoidant':        { level: 1, emoji: '⚡', title: '追逃死循环', text: '经典"焦虑-回避"陷阱：你追ta逃，你越追ta越逃。双方都在用自己的方式保护自己，却恰好戳中对方的伤' },
+        'chaotic':         { level: 2, emoji: '🫧', title: '知己知彼', text: '你们都懂那种不安感，但两个不安的人在一起容易互相触发——需要大量沟通和耐心' },
+        'possessive_dominant': { level: 2, emoji: '🔥', title: '热恋风暴', text: '占有欲+恋爱脑＝浓度爆表的热恋。但别让占有变成控制、焦虑变成绑架' },
+        'romantic_sweet':  { level: 2, emoji: '💝', title: '甜度超标', text: '一个需要爱一个超会表达爱，甜是很甜。但焦虑型需要的不只是浪漫，还有安全感' },
+        'independent_solo':{ level: 1, emoji: '🌵', title: '不在一个频道', text: '你需要大量关注，ta需要大量空间——你们的核心需求几乎是反义词，需要很多妥协' },
+        'rational_calm':   { level: 2, emoji: '🧊', title: '冷暖自知', text: '理性型太"冷"可能让你更焦虑，但ta的稳定也能给你一些踏实感——看你更想要甜还是稳' },
+    },
+    'avoidant': {
+        'secure':          { level: 2, emoji: '🌤️', title: '慢慢融化', text: '安全型是唯一有可能让你心甘情愿打开心门的人。不用急，ta会等你' },
+        'anxious':         { level: 1, emoji: '⚡', title: '追逃死循环', text: '一个追一个逃，陷入死结。你的撤退会触发ta的焦虑，ta的追逼会触发你的逃避——恶性循环' },
+        'avoidant':        { level: 1, emoji: '🏝️', title: '平行时空', text: '两个回避型＝两座孤岛。各自安好互不打扰，但"在一起"的意义在哪儿？容易变成室友关系' },
+        'chaotic':         { level: 2, emoji: '🎭', title: '镜像迷宫', text: '你们都有回避的一面，能互相理解"需要空间"这件事。但两个人都不会主动，关系很难推进' },
+        'possessive_dominant': { level: 1, emoji: '💥', title: '火星撞地球', text: '占有欲强的人需要"主权宣示"，而你的本能是"别碰我"——这是核心价值观的碰撞' },
+        'romantic_sweet':  { level: 2, emoji: '🌬️', title: '冷暖对比色', text: '浪漫型的甜可能让你觉得"腻歪"，但你内心其实也渴望那种被在乎的感觉' },
+        'independent_solo':{ level: 3, emoji: '🌟', title: '神仙室友', text: '你们都需要大量空间，聚是一团火散是满天星。不强求黏在一起，偶尔交汇就足够' },
+        'rational_calm':   { level: 2, emoji: '🤝', title: '互不打扰', text: '两个都不黏人的类型，关系松弛自然。但要有一个人偶尔主动，否则容易凉凉' },
+    },
+    'chaotic': {
+        'secure':          { level: 3, emoji: '🫂', title: '安全港湾', text: '安全型是上天给你最好的礼物。ta不会因为你的纠结而退缩，反而会耐心等你慢慢打开' },
+        'anxious':         { level: 2, emoji: '🫧', title: '知己知彼', text: '你们都在跟不安全感搏斗，能互相理解。但要小心别一起陷入负面情绪的漩涡' },
+        'avoidant':        { level: 2, emoji: '🎭', title: '镜像迷宫', text: '你们都有回避的一面，某种程度能互相理解。但都需要对方先迈出第一步——这就尴尬了' },
+        'chaotic':         { level: 1, emoji: '🌪️', title: '双重纠结', text: '两个纠结矛盾型在一起：都想靠近又都害怕，都在等对方先主动。需要至少一个人勇敢起来' },
+        'possessive_dominant': { level: 2, emoji: '🔮', title: '微妙的平衡', text: '占有欲的"宣示主权"可能让你感到被重视（终于有人这么在意我了！），但也可能让你想逃' },
+        'romantic_sweet':  { level: 2, emoji: '🎀', title: '被甜到的刺猬', text: '浪漫型的热烈表达可能让你既感动又想退缩。试着相信：这次可能不一样' },
+        'independent_solo':{ level: 1, emoji: '🌓', title: '不同世界的星', text: '独立型的"不需要任何人"可能触发你的"看吧果然没有人会一直在我身边"——这是你自己的课题' },
+        'rational_calm':   { level: 2, emoji: '🪴', title: '慢慢来比较快', text: '理性型不催促不逼迫，给你足够的时间思考。这种"不紧不慢"可能正是你需要的节奏' },
+    },
+    'possessive_dominant': {
+        'secure':          { level: 2, emoji: '🔑', title: '理解万岁', text: '安全型不会被你的占有欲吓跑，反而能看到背后的不安。但你要学会控制，别把理解当纵容' },
+        'anxious':         { level: 2, emoji: '🔥', title: '热恋风暴', text: '焦虑型的"黏"能满足你的占有欲——ta的注意力本来就在你身上。但两个人都需要安全感供给' },
+        'avoidant':        { level: 1, emoji: '💥', title: '火星撞地球', text: '你要占领ta要逃跑——这是恋爱中的"领土战争"。两个人都需要做出巨大调整' },
+        'chaotic':         { level: 2, emoji: '🔮', title: '微妙的平衡', text: '纠结型的矛盾可能让你又爱又烦。好在你够主动，能把关系往前推' },
+        'possessive_dominant': { level: 1, emoji: '⚔️', title: '双重主权', text: '两王相遇——都想"占领"对方，但忘了关系不是领土而是花园。需要划定边界' },
+        'romantic_sweet':  { level: 3, emoji: '💘', title: '天生一对', text: '浪漫型喜欢表达爱，正好满足你需要"被在乎"的感觉。你给专属感，ta给仪式感——绝配！' },
+        'independent_solo':{ level: 1, emoji: '🦅', title: '注定不对付', text: '独立型的"不需要任何人"是对你的"你是我的"的终极挑衅。三观不合，慎重' },
+        'rational_calm':   { level: 2, emoji: '⚖️', title: '理性妥协', text: '理性型不会跟你硬碰硬，但也不会被控制。你们需要找到"在乎"和"自由"的平衡点' },
+    },
+    'romantic_sweet': {
+        'secure':          { level: 3, emoji: '🌸', title: '浪漫安全感', text: '一个擅长制造浪漫一个提供安全感——你们的恋爱是别人眼中的童话故事' },
+        'anxious':         { level: 2, emoji: '💝', title: '甜度超标', text: '两个人都超爱表达爱，甜到齁。但别只顾着甜，也要给彼此一些踏实的承诺' },
+        'avoidant':        { level: 2, emoji: '🌬️', title: '冷暖对比色', text: '你的热情可能让回避型觉得"过了"，但如果你够耐心，也有可能慢慢融化冰山' },
+        'chaotic':         { level: 2, emoji: '🎀', title: '被甜到的刺猬', text: '你的浪漫表达对纠结型来说可能是"被坚定选择"的信号，这是ta最需要的东西' },
+        'possessive_dominant': { level: 3, emoji: '💘', title: '天生一对', text: '你的高甜输出满足ta的主权需求，ta的"霸道占有"让你觉得被重视——双向奔赴！' },
+        'romantic_sweet':  { level: 2, emoji: '🎪', title: '加倍甜蜜', text: '两个浪漫灵魂＝偶像剧现场×2。每天都是情人节！但也需要有人管管现实生活' },
+        'independent_solo':{ level: 1, emoji: '🎈', title: '风格迥异', text: '你准备惊喜ta说"不用这么麻烦"——不是不感动，只是表达方式不在一个次元' },
+        'rational_calm':   { level: 2, emoji: '🍬', title: '甜蜜调味', text: '理性型会被你的浪漫感染（嘴上不说），你能给ta的世界加点糖分，ta能给你一些沉稳' },
+    },
+    'independent_solo': {
+        'secure':          { level: 2, emoji: '🌿', title: '舒适距离', text: '安全型会给你恰到好处的空间，让你觉得被爱但没压力。这种"刚好"很珍贵' },
+        'anxious':         { level: 1, emoji: '🌵', title: '不在一个频道', text: '你需要空间ta需要关注——这本质需求差异巨大。不是谁的错，只是碰巧不合适' },
+        'avoidant':        { level: 3, emoji: '🌟', title: '神仙室友', text: '你们互相理解"我需要空间"这句话。在一起但不过度不分，各自精彩又偶尔交汇' },
+        'chaotic':         { level: 1, emoji: '🌓', title: '不同世界的星', text: '你的"一个人也OK"可能被纠结型解读为"你根本不需要我"——但这确实是你的真心话' },
+        'possessive_dominant': { level: 1, emoji: '🦅', title: '注定不对付', text: '占有欲强的人需要"宣示主权"，而你最反感的就是"被宣示"。这是原则问题' },
+        'romantic_sweet':  { level: 1, emoji: '🎈', title: '风格迥异', text: '浪漫型精心策划的惊喜你可能觉得"压力山大"——不是不领情，只是不太适应这种表达' },
+        'independent_solo':{ level: 3, emoji: '🌌', title: '银河双星', text: '两个独立灵魂在一起：各自发光靠近但不灼伤。你们是彼此人生的加分项不是必需品' },
+        'rational_calm':   { level: 2, emoji: '🍃', title: '平静共鸣', text: '两个人都理性、松弛、不给对方压力。关系轻松得像一阵温柔的风' },
+    },
+    'rational_calm': {
+        'secure':          { level: 3, emoji: '🏠', title: '恒温爱情', text: '两个人都走踏实风，不炒作不内耗——你们的恋爱是保温杯不是烟花，但暖得长久' },
+        'anxious':         { level: 2, emoji: '🧊', title: '冷暖自知', text: '你的"冷静"可能让焦虑型更焦虑，但你的稳定也是ta需要的那颗定心丸' },
+        'avoidant':        { level: 2, emoji: '🤝', title: '互不打扰', text: '两个不黏人的类型在一起，舒服是舒服。但别太佛系了，偶尔也要主动联络感情' },
+        'chaotic':         { level: 2, emoji: '🪴', title: '慢慢来比较快', text: '你的"不催促不逼迫"是纠结型最需要的东西，让ta有时间在自己的节奏里慢慢打开' },
+        'possessive_dominant': { level: 2, emoji: '⚖️', title: '理性妥协', text: '你不会跟占有欲硬碰硬，但也守得住自己的底线。需要沟通找到彼此的舒适区' },
+        'romantic_sweet':  { level: 2, emoji: '🍬', title: '甜蜜调味', text: '浪漫型会给你的世界加点糖——虽然你觉得"差不多就行了"，但偶尔甜一下也不错' },
+        'independent_solo':{ level: 2, emoji: '🍃', title: '平静共鸣', text: '你们都不给对方压力，都不需要过多关注。这种松弛的关系健康得像教科书' },
+        'rational_calm':   { level: 2, emoji: '☕', title: '舒适日常', text: '两个佛系选手在一起：吃饭散步聊天，平淡但真实。没有狗血剧情，但每一天都踏实' },
+    },
+};
+
+/* ----- 图鉴页面 ----- */
+function showEncyclopedia() {
+    document.getElementById('landing-section').style.display = 'none';
+    document.getElementById('test-section').style.display = 'none';
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'none';
+    document.getElementById('encyclopedia-section').style.display = 'block';
+    renderTypeCards();
+    renderMatchMatrix();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function backFromEncyclopedia() {
+    document.getElementById('encyclopedia-section').style.display = 'none';
+    document.getElementById('landing-section').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderTypeCards() {
+    const grid = document.getElementById('type-cards-grid');
+    const typeKeys = Object.keys(LOVE_TYPES);
+
+    let html = '';
+    typeKeys.forEach(key => {
+        const type = LOVE_TYPES[key];
+        const traits = TYPE_TRAITS[key];
+        html += `
+            <div class="type-card" onclick="this.classList.toggle('flipped')">
+                <div class="type-card-inner">
+                    <div class="type-card-front">
+                        <div class="type-card-emoji">${type.emoji}</div>
+                        <div class="type-card-name">${type.name}</div>
+                        <div class="type-card-tagline">${type.tagline}</div>
+                        <div class="type-card-vibe">${traits.vibe}</div>
+                        <div class="type-card-hint">👆 点击翻看详情</div>
+                    </div>
+                    <div class="type-card-back">
+                        <div class="type-card-back-header">${type.emoji} ${type.name}</div>
+                        <div class="type-traits-list">
+                            ${traits.traits.map(t => `
+                                <div class="type-trait-item">
+                                    <span class="type-trait-emoji">${t.emoji}</span>
+                                    <div class="type-trait-content">
+                                        <span class="type-trait-name">${t.name}</span>
+                                        <span class="type-trait-text">${t.text}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="type-stat-bars">
+                            ${renderStatBar('情绪稳定', traits.stats.stability)}
+                            ${renderStatBar('浪漫指数', traits.stats.romance)}
+                            ${renderStatBar('情感浓度', traits.stats.intensity)}
+                            ${renderStatBar('独立精神', traits.stats.independence)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
+function renderStatBar(label, value) {
+    const color = value >= 80 ? 'var(--pink)' : value >= 50 ? 'var(--purple)' : 'var(--blue)';
+    return `
+        <div class="stat-bar-row">
+            <span class="stat-bar-label">${label}</span>
+            <div class="stat-bar-track">
+                <div class="stat-bar-fill" style="width:${value}%; background:${color};"></div>
+            </div>
+            <span class="stat-bar-value">${value}</span>
+        </div>
+    `;
+}
+
+function renderMatchMatrix() {
+    const container = document.getElementById('match-matrix');
+    const typeKeys = Object.keys(LOVE_TYPES);
+    const typeNames = typeKeys.map(k => ({ key: k, ...LOVE_TYPES[k] }));
+
+    // 选择器
+    let selectorHTML = '<div class="match-selector"><span class="match-selector-label">试试配对：</span>';
+    typeNames.forEach((t, i) => {
+        selectorHTML += `<button class="match-selector-type" data-type="${t.key}" onclick="highlightMatch('${t.key}')">${t.emoji} ${t.name}</button>`;
+    });
+    selectorHTML += '</div>';
+
+    // 矩阵表
+    let tableHTML = '<div class="match-table-wrap"><table class="match-table"><thead><tr><th></th>';
+    typeNames.forEach(t => {
+        tableHTML += `<th class="match-th" data-type="${t.key}">${t.emoji}<br><span class="match-th-name">${t.name}</span></th>`;
+    });
+    tableHTML += '</tr></thead><tbody>';
+
+    typeNames.forEach(rowType => {
+        tableHTML += '<tr>';
+        tableHTML += `<td class="match-row-header" data-type="${rowType.key}"><span class="match-th-emoji">${rowType.emoji}</span><span class="match-th-name">${rowType.name}</span></td>`;
+        typeNames.forEach(colType => {
+            const match = MATCH_MATRIX[rowType.key][colType.key];
+            const isSelf = rowType.key === colType.key;
+            const levelClass = match.level === 3 ? 'match-high' : match.level === 2 ? 'match-mid' : 'match-low';
+            tableHTML += `
+                <td class="match-cell ${levelClass}" data-row="${rowType.key}" data-col="${colType.key}"
+                    title="${match.title}: ${match.text}"
+                    onclick="showMatchPopup('${rowType.key}', '${colType.key}')">
+                    <div class="match-cell-emoji">${match.emoji}</div>
+                    <div class="match-cell-stars">${'⭐'.repeat(match.level)}</div>
+                </td>
+            `;
+        });
+        tableHTML += '</tr>';
+    });
+
+    tableHTML += '</tbody></table></div>';
+
+    container.innerHTML = selectorHTML + tableHTML;
+}
+
+function highlightMatch(typeKey) {
+    // 移除所有高亮
+    document.querySelectorAll('.match-cell.highlighted, .match-th.highlighted, .match-row-header.highlighted').forEach(el => {
+        el.classList.remove('highlighted');
+    });
+
+    // 如果没有选择类型则返回
+    if (!typeKey) return;
+
+    // 高亮行列
+    document.querySelectorAll(`.match-cell[data-row="${typeKey}"], .match-cell[data-col="${typeKey}"]`).forEach(el => {
+        el.classList.add('highlighted');
+    });
+    document.querySelectorAll(`.match-th[data-type="${typeKey}"], .match-row-header[data-type="${typeKey}"]`).forEach(el => {
+        el.classList.add('highlighted');
+    });
+
+    // 滚动选择器到可见位置
+    const matrixTable = document.querySelector('.match-table-wrap');
+    const firstCell = document.querySelector(`.match-th[data-type="${typeKey}"]`);
+    if (firstCell && matrixTable) {
+        firstCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+}
+
+function showMatchPopup(typeA, typeB) {
+    const match = MATCH_MATRIX[typeA][typeB];
+    const typeAData = LOVE_TYPES[typeA];
+    const typeBData = LOVE_TYPES[typeB];
+
+    const popup = document.createElement('div');
+    popup.className = 'match-popup-overlay';
+    popup.innerHTML = `
+        <div class="match-popup-card">
+            <button class="match-popup-close" onclick="this.closest('.match-popup-overlay').remove()">✕</button>
+            <div class="match-popup-header">
+                <span class="match-popup-types">${typeAData.emoji} ${typeAData.name} × ${typeBData.emoji} ${typeBData.name}</span>
+            </div>
+            <div class="match-popup-badge">${match.emoji} ${match.title}</div>
+            <div class="match-popup-stars">${'⭐'.repeat(match.level)}</div>
+            <p class="match-popup-text">${match.text}</p>
+            <button class="match-popup-btn" onclick="this.closest('.match-popup-overlay').remove()">知道啦</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) popup.remove();
+    });
 }

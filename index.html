@@ -43,7 +43,27 @@
             </button>
 
             <button class="history-entry-btn" onclick="showHistory()">📋 历史记录</button>
+            <button class="encyclopedia-entry-btn" onclick="showEncyclopedia()">📖 恋爱图鉴</button>
 
+        </div>
+    </section>
+
+    <!-- ========== 恋爱类型图鉴页 ========== -->
+    <section id="encyclopedia-section" style="display:none;">
+        <div class="encyclopedia-container">
+            <div class="encyclopedia-header">
+                <button class="back-btn" onclick="backFromEncyclopedia()">← 返回首页</button>
+                <h2 class="encyclopedia-title">📖 恋爱类型图鉴</h2>
+                <p class="encyclopedia-subtitle">8种恋爱人格完全档案 + 配对兼容度全解析</p>
+            </div>
+
+            <!-- 类型卡片 -->
+            <div class="encyclopedia-section-title">🎴 类型图鉴 <span class="encyclopedia-hint">（点击卡片翻转查看详情）</span></div>
+            <div class="type-cards-grid" id="type-cards-grid"></div>
+
+            <!-- 配对矩阵 -->
+            <div class="encyclopedia-section-title">💞 配对兼容度矩阵 <span class="encyclopedia-hint">（点击任意类型高亮其配对 / 点击格子查看详情）</span></div>
+            <div id="match-matrix"></div>
         </div>
     </section>
 
